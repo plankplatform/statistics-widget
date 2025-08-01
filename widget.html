@@ -22,6 +22,14 @@
   </head>
   <body>
     <div id="stats-widget"></div>
+    <script>
+      const urlParams = new URLSearchParams(window.location.search);
+      
+      const token = urlParams.get('token');
+      if (token) {
+        sessionStorage.setItem('apitoken', token);
+      }
+    </script>
     <script type="module" src="/plank/statistics-widget/dist/assets/main.js?v1.0.7"></script>
   </body>
 </html>
