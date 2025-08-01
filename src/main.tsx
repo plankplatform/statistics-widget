@@ -46,6 +46,9 @@ async function setup() {
     const statId = params.get("statId") ?? "";
     const graphId = params.get("graphId") ?? "";
 
+    console.log("Stat ID:", statId);
+    console.log("Graph ID:", graphId);
+
     const container = document.getElementById("stats-widget");
     if (!container) {
       console.error("stats-widget not found");
