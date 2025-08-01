@@ -46,7 +46,6 @@ export default function App({ statId, graphId }: AppProps) {
   const [chartModel, setChartModel] = useState<ChartModel | null>(null);
   const [loading, setLoading] = useState(true);
   const gridRef = useRef<AgGridReact>(null);
-  const chartContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     async function fetchAll() {
@@ -58,11 +57,8 @@ export default function App({ statId, graphId }: AppProps) {
           ? JSON.parse(raw.grid_state)
           : undefined;
 
-        const charts = await apiFetch(`v1/stats/graphs?stat_id=${raw.id}`);
-        const selectedChart = charts.find(
-          (chart: any) => String(chart.id) == graphId
-        );
-        const config = selectedChart?.config;
+        const chart = await apiFetch(`v1/stats/graphs/${graphId}`);
+        const config = chart?.config;
         const parsedChartModel =
           typeof config === "string" ? JSON.parse(config) : config;
 
@@ -133,7 +129,6 @@ export default function App({ statId, graphId }: AppProps) {
       api.setRowGroupColumns(gridState.rowGroupCols || []);
       api.setPivotColumns(gridState.pivotCols || []);
       api.setValueColumns(gridState.valueCols || []);
-      api.setPivotMode?.(gridState.pivotMode);
 
       if (gridState.columnState?.length > 0) {
         api.applyColumnState({
@@ -165,35 +160,34 @@ export default function App({ statId, graphId }: AppProps) {
   };
 
   if (!loading && (!data || data.rows.length === 0)) {
-  return <p className="text-center text-red-500">No data available</p>;
-}
+    return <p className="text-center text-red-500">No data available</p>;
+  }
 
-return (
-  <div className="w-full h-full flex flex-col">
-    <div className="flex-none px-4 py-2">
-      <h2 className="text-xl text-center font-bold">{data?.title}</h2>
+  return (
+    <div className="w-full h-full flex flex-col">
+      <div className="flex-none px-4 py-2">
+        <h2 className="text-xl text-center font-bold">{data?.title}</h2>
+      </div>
+
+      <div className="ag-theme-alpine hidden" style={{ height: 1, width: 1 }}>
+        <AgGridReact
+          ref={gridRef}
+          rowData={castedRows}
+          columnDefs={columnDefs}
+          enableCharts={true}
+          cellSelection={true}
+          defaultColDef={{
+            sortable: true,
+            filter: true,
+            resizable: true,
+          }}
+          onFirstDataRendered={handleFirstDataRendered}
+        />
+      </div>
+
+      <div id="chart-container" className="flex-1 overflow-hidden relative">
+        {loading && <Loader />}
+      </div>
     </div>
-
-    <div className="ag-theme-alpine hidden" style={{ height: 1, width: 1 }}>
-      <AgGridReact
-        ref={gridRef}
-        rowData={castedRows}
-        columnDefs={columnDefs}
-        enableCharts={true}
-        cellSelection={true}
-        defaultColDef={{
-          sortable: true,
-          filter: true,
-          resizable: true,
-        }}
-        onFirstDataRendered={handleFirstDataRendered}
-      />
-    </div>
-
-    <div id="chart-container" className="flex-1 overflow-hidden relative">
-      {loading && <Loader />}
-    </div>
-  </div>
-);
-
+  );
 }
