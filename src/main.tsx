@@ -41,7 +41,7 @@ async function setup() {
     }
   }
 
-  const container = document.getElementById('root');
+  const container = document.getElementById('stats-widget');
   if (!container) throw new Error('Root container not found');
 
   const statId = container.dataset.statId ?? '';
@@ -51,12 +51,7 @@ async function setup() {
   console.log('Graph ID:', graphId);
 
   ReactDOM.createRoot(container).render(
-    <div
-      id="react-container"
-      className="flex flex-col w-full overflow-x-hidden !text-black !bg-white !text-xl mb-24"
-    >
       <App statId={statId} graphId={graphId} />
-    </div>
   );
 }
 

@@ -1,11 +1,18 @@
-import { useEffect, useRef, useState, useMemo } from 'react';
-import { AgGridReact } from 'ag-grid-react';
-import { ModuleRegistry } from 'ag-grid-community';
-import { AllEnterpriseModule, IntegratedChartsModule } from 'ag-grid-enterprise';
-import { AgChartsEnterpriseModule } from 'ag-charts-enterprise';
-import type { ChartModel, FirstDataRenderedEvent, ColDef } from 'ag-grid-community';
-import { apiFetch } from './lib/api';
-import Loader from './components/Loader';
+import { useEffect, useRef, useState, useMemo } from "react";
+import { AgGridReact } from "ag-grid-react";
+import { ModuleRegistry } from "ag-grid-community";
+import {
+  AllEnterpriseModule,
+  IntegratedChartsModule,
+} from "ag-grid-enterprise";
+import { AgChartsEnterpriseModule } from "ag-charts-enterprise";
+import type {
+  ChartModel,
+  FirstDataRenderedEvent,
+  ColDef,
+} from "ag-grid-community";
+import { apiFetch } from "./lib/api";
+import Loader from "./components/Loader";
 
 ModuleRegistry.registerModules([
   AllEnterpriseModule,
@@ -45,14 +52,19 @@ export default function App({ statId, graphId }: AppProps) {
     async function fetchAll() {
       try {
         const raw = await apiFetch(`v1/stats/${statId}`);
-        const columns = JSON.parse(raw.columns_order || '[]');
-        const rows = JSON.parse(raw.json_results || '[]');
-        const gridState = raw.grid_state ? JSON.parse(raw.grid_state) : undefined;
+        const columns = JSON.parse(raw.columns_order || "[]");
+        const rows = JSON.parse(raw.json_results || "[]");
+        const gridState = raw.grid_state
+          ? JSON.parse(raw.grid_state)
+          : undefined;
 
         const charts = await apiFetch(`v1/stats/graphs?stat_id=${raw.id}`);
-        const selectedChart = charts.find((chart: any) => String(chart.id) == graphId);
+        const selectedChart = charts.find(
+          (chart: any) => String(chart.id) == graphId
+        );
         const config = selectedChart?.config;
-        const parsedChartModel = typeof config === 'string' ? JSON.parse(config) : config;
+        const parsedChartModel =
+          typeof config === "string" ? JSON.parse(config) : config;
 
         setData({
           id: raw.id,
@@ -64,7 +76,7 @@ export default function App({ statId, graphId }: AppProps) {
 
         setChartModel(parsedChartModel);
       } catch (e) {
-        console.error('Error fetching data or chart:', e);
+        console.error("Error fetching data or chart:", e);
       } finally {
         setLoading(false);
       }
@@ -78,7 +90,8 @@ export default function App({ statId, graphId }: AppProps) {
       const newRow: Record<string, any> = {};
       for (const key of cols) {
         const val = row[key];
-        newRow[key] = !isNaN(val) && val !== '' && val !== null ? Number(val) : val;
+        newRow[key] =
+          !isNaN(val) && val !== "" && val !== null ? Number(val) : val;
       }
       return newRow;
     });
@@ -92,14 +105,16 @@ export default function App({ statId, graphId }: AppProps) {
     if (!data) return [];
 
     return data.columns.map((col) => {
-      const firstValue = castedRows.find((row) => row[col] !== undefined && row[col] !== null)?.[col];
-      const isNumeric = typeof firstValue === 'number';
+      const firstValue = castedRows.find(
+        (row) => row[col] !== undefined && row[col] !== null
+      )?.[col];
+      const isNumeric = typeof firstValue === "number";
 
       return {
         field: col,
-        filter: isNumeric ? 'agNumberColumnFilter' : 'agTextColumnFilter',
-        type: isNumeric ? 'numericColumn' : undefined,
-        chartDataType: isNumeric ? 'series' : 'category',
+        filter: isNumeric ? "agNumberColumnFilter" : "agTextColumnFilter",
+        type: isNumeric ? "numericColumn" : undefined,
+        chartDataType: isNumeric ? "series" : "category",
         enablePivot: true,
         enableRowGroup: true,
         enableValue: true,
@@ -132,41 +147,53 @@ export default function App({ statId, graphId }: AppProps) {
       api.sizeColumnsToFit();
     }
 
-    if (chartModel && chartContainerRef.current) {
+    if (chartModel) {
       setTimeout(() => {
-        chartContainerRef.current!.innerHTML = '';
-        const chartRef = api.restoreChart(chartModel, chartContainerRef.current!);
+        const container = document.getElementById("chart-container");
+        if (!container) {
+          console.warn("Container non trovato");
+          return;
+        }
+
+        container.innerHTML = "";
+        const chartRef = api.restoreChart(chartModel, container);
         if (!chartRef) {
-          console.warn('Impossibile ricreare il grafico');
+          console.warn("Impossibile ricreare il grafico");
         }
       }, 100);
     }
   };
 
-  if (loading) return <Loader />;
-  if (!data) return <p className="text-center text-red-500">No data found</p>;
+  if (!loading && (!data || data.rows.length === 0)) {
+  return <p className="text-center text-red-500">No data available</p>;
+}
 
-  return (
-    <div className="p-6 w-full">
-      <h2 className="text-xl font-bold mb-2">{data.title}</h2>
-
-      <div className="ag-theme-alpine" style={{ height: 500, width: '100%' }}>
-        <AgGridReact
-          ref={gridRef}
-          rowData={castedRows}
-          columnDefs={columnDefs}
-          enableCharts={true}
-          cellSelection={true}
-          defaultColDef={{
-            sortable: true,
-            filter: true,
-            resizable: true,
-          }}
-          onFirstDataRendered={handleFirstDataRendered}
-        />
-      </div>
-
-      <div ref={chartContainerRef} id="chart-container" className="w-full h-[400px] mt-6" />
+return (
+  <div className="w-full h-full flex flex-col">
+    <div className="flex-none px-4 py-2">
+      <h2 className="text-xl text-center font-bold">{data?.title}</h2>
     </div>
-  );
+
+    <div className="ag-theme-alpine hidden" style={{ height: 1, width: 1 }}>
+      <AgGridReact
+        ref={gridRef}
+        rowData={castedRows}
+        columnDefs={columnDefs}
+        enableCharts={true}
+        cellSelection={true}
+        defaultColDef={{
+          sortable: true,
+          filter: true,
+          resizable: true,
+        }}
+        onFirstDataRendered={handleFirstDataRendered}
+      />
+    </div>
+
+    <div id="chart-container" className="flex-1 overflow-hidden relative">
+      {loading && <Loader />}
+    </div>
+  </div>
+);
+
 }
