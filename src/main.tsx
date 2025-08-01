@@ -41,24 +41,22 @@ async function setup() {
     }
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
-    const params = new URLSearchParams(window.location.search);
-    const statId = params.get("statId") ?? "";
-    const graphId = params.get("graphId") ?? "";
+  const params = new URLSearchParams(window.location.search);
+  const statId = params.get("statId") ?? "";
+  const graphId = params.get("graphId") ?? "";
 
-    console.log("Stat ID:", statId);
-    console.log("Graph ID:", graphId);
+  console.log("Stat ID:", statId);
+  console.log("Graph ID:", graphId);
 
-    const container = document.getElementById("stats-widget");
-    if (!container) {
-      console.error("stats-widget not found");
-      return;
-    }
+  const container = document.getElementById("stats-widget");
+  if (!container) {
+    console.error("stats-widget not found");
+    return;
+  }
 
-    ReactDOM.createRoot(container).render(
-      <App statId={statId} graphId={graphId} />
-    );
-  });
+  ReactDOM.createRoot(container).render(
+    <App statId={statId} graphId={graphId} />
+  );
 }
 
 setup();
