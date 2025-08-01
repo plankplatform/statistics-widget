@@ -12,4 +12,18 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  base: './',
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
+    emptyOutDir: true,
+    rollupOptions: {
+      input: path.resolve(__dirname, 'src/main.tsx'), // entry JS
+      output: {
+        entryFileNames: 'assets/[name].js',
+        chunkFileNames: 'assets/[name].js',
+        assetFileNames: 'assets/[name].[ext]',
+      },
+    },
+  },
 })
