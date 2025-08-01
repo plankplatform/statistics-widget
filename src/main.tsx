@@ -41,16 +41,21 @@ async function setup() {
     }
   }
 
-  const params = new URLSearchParams(window.location.search);
-  const statId = params.get("statId") ?? "";
-  const graphId = params.get("graphId") ?? "";
+  document.addEventListener("DOMContentLoaded", () => {
+    const params = new URLSearchParams(window.location.search);
+    const statId = params.get("statId") ?? "";
+    const graphId = params.get("graphId") ?? "";
 
-  const container = document.getElementById("stats-widget");
-  if (!container) throw new Error("Root container not found");
+    const container = document.getElementById("stats-widget");
+    if (!container) {
+      console.error("stats-widget not found");
+      return;
+    }
 
-  ReactDOM.createRoot(container).render(
-    <App statId={statId} graphId={graphId} />
-  );
+    ReactDOM.createRoot(container).render(
+      <App statId={statId} graphId={graphId} />
+    );
+  });
 }
 
 setup();
