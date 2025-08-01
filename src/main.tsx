@@ -41,6 +41,7 @@ async function setup() {
     }
   }
 
+  document.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(window.location.search);
   const statId = params.get("statId") ?? "";
   const graphId = params.get("graphId") ?? "";
@@ -57,6 +58,8 @@ async function setup() {
   ReactDOM.createRoot(container).render(
     <App statId={statId} graphId={graphId} />
   );
+});
+
 }
 
 setup();
