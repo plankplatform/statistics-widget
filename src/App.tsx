@@ -162,11 +162,13 @@ export default function App({ statId, graphId }: AppProps) {
   if (!loading && (!data || data.rows.length === 0)) {
     return <p className="text-center text-red-500">No data available</p>;
   }
-
+  console.log("BUUUUUUUUUUUUU");
   return (
     <div className="w-full h-full flex flex-col">
       <div className="flex-none px-4 py-2">
         <h2 className="text-xl text-center font-bold">{data?.title}</h2>
+        <h2 className="text-xl text-center font-bold">SE MI VEDI FUNZIONO</h2>
+      
       </div>
 
       <div className="ag-theme-alpine hidden" style={{ height: 1, width: 1 }}>
