@@ -4,6 +4,11 @@ import "./index.css";
 import "ag-grid-enterprise";
 import { LicenseManager } from "ag-grid-enterprise";
 
+import WidgetChart from "./WidgetChart";
+
+
+
+
 const licenseKey = import.meta.env.VITE_AG_GRID_LICENSE;
 if (licenseKey) {
   LicenseManager.setLicenseKey(licenseKey);
@@ -54,8 +59,14 @@ async function setup() {
     return;
   }
 
+  /*
   ReactDOM.createRoot(container).render(
     <App statId={statId} graphId={graphId} />
+  );
+  */
+
+  ReactDOM.createRoot(container).render(
+  <WidgetChart statId={statId} graphId={graphId} />
   );
 
 }
