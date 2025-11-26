@@ -5,6 +5,7 @@ import "ag-grid-enterprise";
 import { LicenseManager } from "ag-grid-enterprise";
 
 import WidgetChart from "./WidgetChart";
+import ShareSnapshot from "./Snapshot";
 
 
 
@@ -59,14 +60,16 @@ async function setup() {
     return;
   }
 
-  /*
-  ReactDOM.createRoot(container).render(
-    <App statId={statId} graphId={graphId} />
-  );
-  */
+  const snapshotId = params.get("snapshotId") ?? "";
+  if (snapshotId) {
+    ReactDOM.createRoot(container).render(
+      <ShareSnapshot snapshotId={snapshotId} />
+    );
+    return;
+  }
 
   ReactDOM.createRoot(container).render(
-  <WidgetChart statId={statId} graphId={graphId} />
+  <WidgetChart statId={statId} graphId={graphId} /> // idem per App
   );
 
 }
