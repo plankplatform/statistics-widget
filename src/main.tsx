@@ -1,14 +1,10 @@
 import ReactDOM from "react-dom/client";
-import App from "./App";
 import "./index.css";
 import "ag-grid-enterprise";
 import { LicenseManager } from "ag-grid-enterprise";
 
 import WidgetChart from "./WidgetChart";
-import ShareSnapshot from "./Snapshot";
-
-
-
+import Snapshot from "./Snapshot";
 
 const licenseKey = import.meta.env.VITE_AG_GRID_LICENSE;
 if (licenseKey) {
@@ -18,26 +14,19 @@ if (licenseKey) {
 const env = import.meta.env.VITE_APP_ENV;
 
 async function setup() {
-  // Autenticazione locale solo in dev/local
   if (env === "local") {
-    if (sessionStorage.getItem("apitoken")) {
-      console.log("API token already set in sessionStorage");
-    } else {
-      console.log("Fetching API token...");
+    if (!sessionStorage.getItem("apitoken")) {
       const response = await fetch(
         `${import.meta.env.VITE_API_BASE_URL}/v1/auth/user/login`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             userid: import.meta.env.VITE_API_USER,
             password: import.meta.env.VITE_API_PASSWORD,
           }),
         }
       );
-
       const data = await response.json();
       if (data.jwt) {
         sessionStorage.setItem("apitoken", data.jwt);
@@ -50,9 +39,7 @@ async function setup() {
   const params = new URLSearchParams(window.location.search);
   const statId = params.get("statId") ?? "";
   const graphId = params.get("graphId") ?? "";
-
-  console.log("Stat ID:", statId);
-  console.log("Graph ID:", graphId);
+  const token = params.get("token") ?? "";
 
   const container = document.getElementById("stats-widget");
   if (!container) {
@@ -60,18 +47,14 @@ async function setup() {
     return;
   }
 
-  const snapshotId = params.get("snapshotId") ?? "";
-  if (snapshotId) {
-    ReactDOM.createRoot(container).render(
-      <ShareSnapshot snapshotId={snapshotId} />
-    );
+  if (token) {
+    ReactDOM.createRoot(container).render(<Snapshot token={token} />);
     return;
   }
 
   ReactDOM.createRoot(container).render(
-  <WidgetChart statId={statId} graphId={graphId} /> // idem per App
+    <WidgetChart statId={statId} graphId={graphId} />
   );
-
 }
 
 setup();

@@ -1,10 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AgGridReact } from "ag-grid-react";
 import { ModuleRegistry } from "ag-grid-community";
-import {
-  AllEnterpriseModule,
-  IntegratedChartsModule,
-} from "ag-grid-enterprise";
+import { AllEnterpriseModule, IntegratedChartsModule } from "ag-grid-enterprise";
 import { AgChartsEnterpriseModule } from "ag-charts-enterprise";
 import type { ColDef, FirstDataRenderedEvent } from "ag-grid-community";
 import Loader from "./components/Loader";
@@ -17,14 +14,15 @@ ModuleRegistry.registerModules([
 
 type SnapshotPayload = {
   title?: string;
-  columns_order: string | string[];
-  json_results: string | Record<string, any>[];
-  filters?: string | Record<string, any>;
-  sorting?: string | any[];
-  config: string | any; 
+  columns_order: string[] | string;
+  json_results: Record<string, any>[] | string;
+  filters?: Record<string, any> | string | null;
+  sorting?: any[] | string | null;
+  config: any | string;
+  grid_state?: Record<string, any> | string | null;
 };
 
-export default function ShareSnapshot({ snapshotId }: { snapshotId: string }) {
+export default function Snapshot({ token }: { token: string }) {
   const gridRef = useRef<AgGridReact>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -44,34 +42,37 @@ export default function ShareSnapshot({ snapshotId }: { snapshotId: string }) {
       setLoading(true);
       setError(null);
       try {
-        const raw: SnapshotPayload = await apiFetchPublic(`v1/newsletter/snapshots/${snapshotId}`); // TODO: l'api non esiste ancora
+        const raw: SnapshotPayload = await apiFetchPublic(
+          `v1/newsletter/snapshots/${encodeURIComponent(token)}`
+        );
         if (disposed) return;
 
-        const cols =
-          typeof raw.columns_order === "string"
-            ? JSON.parse(raw.columns_order)
-            : raw.columns_order;
-        const dataRows =
-          typeof raw.json_results === "string"
-            ? JSON.parse(raw.json_results)
-            : raw.json_results;
-        const flt =
-          raw.filters && typeof raw.filters === "string"
-            ? JSON.parse(raw.filters)
-            : raw.filters;
-        const srt =
-          raw.sorting && typeof raw.sorting === "string"
-            ? JSON.parse(raw.sorting)
-            : raw.sorting;
-        const cfg =
-          typeof raw.config === "string" ? JSON.parse(raw.config) : raw.config;    
+        const parseMaybe = <T,>(val: T | string | null | undefined) => {
+          if (val === null || val === undefined) return null;
+          if (typeof val === "string") {
+            try {
+              return JSON.parse(val);
+            } catch {
+              return val;
+            }
+          }
+          return val;
+        };
 
-        setColumns(cols || []);
-        setRows(dataRows || []);
-        setFilters(flt || null);
-        setSorting(srt || null);
-        setModel(cfg || null);
-        setTitle(raw.title || ""); // TODO forse uso query_name per il titolo
+        const cols = (parseMaybe(raw.columns_order) as string[]) || [];
+        const dataRows = (parseMaybe(raw.json_results) as Record<string, any>[]) || [];
+        const flt = parseMaybe(raw.filters);
+        const srt = parseMaybe(raw.sorting);
+        const cfg = parseMaybe(raw.config);
+        const gs = parseMaybe(raw.grid_state);
+
+        setColumns(cols);
+        setRows(dataRows);
+        setFilters(flt);
+        setSorting(srt);
+        setModel(cfg);
+        setTitle(raw.title || "");
+        // grid_state (gs) non usata qui, ma puoi applicarla se serve.
       } catch (e) {
         if (disposed) return;
         console.error(e);
@@ -85,7 +86,7 @@ export default function ShareSnapshot({ snapshotId }: { snapshotId: string }) {
     return () => {
       disposed = true;
     };
-  }, [snapshotId]);
+  }, [token]);
 
   const castedRows = useMemo(() => {
     return rows.map((row) => {
