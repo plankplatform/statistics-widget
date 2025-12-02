@@ -20,6 +20,7 @@ type SnapshotPayload = {
   sorting?: any[] | string | null;
   config: any | string;
   grid_state?: Record<string, any> | string | null;
+  query_name?: string | null;
 };
 
 export default function Snapshot({ token }: { token: string }) {
@@ -42,12 +43,10 @@ export default function Snapshot({ token }: { token: string }) {
       setLoading(true);
       setError(null);
       try {
-        const raw: SnapshotPayload = await apiFetchPublic(
-          `v1/newsletter/snapshots/${encodeURIComponent(token)}`
-        );
+        const raw: SnapshotPayload = await apiFetchPublic(`v1/newsletter/snapshots/${encodeURIComponent(token)}`);
         if (disposed) return;
 
-        const parseMaybe = <T,>(val: T | string | null | undefined) => {
+        const parseValue = <T,>(val: T | string | null | undefined) => {
           if (val === null || val === undefined) return null;
           if (typeof val === "string") {
             try {
@@ -59,20 +58,20 @@ export default function Snapshot({ token }: { token: string }) {
           return val;
         };
 
-        const cols = (parseMaybe(raw.columns_order) as string[]) || [];
-        const dataRows = (parseMaybe(raw.json_results) as Record<string, any>[]) || [];
-        const flt = parseMaybe(raw.filters);
-        const srt = parseMaybe(raw.sorting);
-        const cfg = parseMaybe(raw.config);
-        const gs = parseMaybe(raw.grid_state);
+        const cols = (parseValue(raw.columns_order) as string[]) || [];
+        const dataRows = (parseValue(raw.json_results) as Record<string, any>[]) || [];
+        const flt = parseValue(raw.filters);
+        const srt = parseValue(raw.sorting);
+        const cfg = parseValue(raw.config);
+        const query_name = parseValue(raw.query_name);
+        const grid_state = parseValue(raw.grid_state);
 
         setColumns(cols);
         setRows(dataRows);
         setFilters(flt);
         setSorting(srt);
         setModel(cfg);
-        setTitle(raw.title || "");
-        // grid_state (gs) non usata qui, ma puoi applicarla se serve.
+        setTitle(raw.title || ""); // vedere se mettere query_name
       } catch (e) {
         if (disposed) return;
         console.error(e);
@@ -144,7 +143,7 @@ export default function Snapshot({ token }: { token: string }) {
   if (error) {
     return (
       <div className="h-screen flex items-center justify-center">
-        <p className="text-center text-red-500">{error}</p>
+        <p className="text-center text-red-500">Error: {error}</p>
       </div>
     );
   }
