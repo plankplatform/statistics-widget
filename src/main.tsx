@@ -47,14 +47,17 @@ async function setup() {
     return;
   }
 
-  if (token) {
+
+  if(statId && graphId){
+    ReactDOM.createRoot(container).render(
+      <WidgetChart statId={statId} graphId={graphId} />
+    );
+  } else if (token && !statId && !graphId) {
     ReactDOM.createRoot(container).render(<Snapshot token={token} />);
-    return;
+  } else {
+    console.error("statId and graphId or token parameters are required");
   }
 
-  ReactDOM.createRoot(container).render(
-    <WidgetChart statId={statId} graphId={graphId} />
-  );
 }
 
 setup();

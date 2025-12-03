@@ -71,7 +71,7 @@ export default function Snapshot({ token }: { token: string }) {
         setFilters(flt);
         setSorting(srt);
         setModel(cfg);
-        setTitle(raw.title || ""); // vedere se mettere query_name
+        setTitle(query_name || "");
       } catch (e) {
         if (disposed) return;
         console.error(e);
