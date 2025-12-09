@@ -5,6 +5,7 @@ import { LicenseManager } from "ag-grid-enterprise";
 
 import WidgetChart from "./WidgetChart";
 import Snapshot from "./Snapshot";
+import TableWidget from "./WidgetTable";
 
 const licenseKey = import.meta.env.VITE_AG_GRID_LICENSE;
 if (licenseKey) {
@@ -40,6 +41,7 @@ async function setup() {
   const statId = params.get("statId") ?? "";
   const graphId = params.get("graphId") ?? "";
   const token = params.get("token") ?? "";
+  const view = params.get("view") ?? "snapshot";
 
   const container = document.getElementById("stats-widget");
   if (!container) {
@@ -53,7 +55,9 @@ async function setup() {
       <WidgetChart statId={statId} graphId={graphId} />
     );
   } else if (token && !statId && !graphId) {
-    ReactDOM.createRoot(container).render(<Snapshot token={token} />);
+   ReactDOM.createRoot(container).render(
+      view === "table" ? <TableWidget token={token} /> : <Snapshot token={token} />
+    );
   } else {
     console.error("statId and graphId or token parameters are required");
   }
