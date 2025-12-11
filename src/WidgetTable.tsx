@@ -141,8 +141,8 @@ export default function TableWidget({ token }: { token: string }) {
       return;
     }
 
+    api.setGridOption("pivotMode", !!gridState.pivotMode);
     api.setFilterModel(gridState.filters || {});
-    //api.setPivotMode(!!gridState.pivotMode);
     api.setRowGroupColumns(gridState.rowGroupCols || []);
     api.setPivotColumns(gridState.pivotCols || []);
     api.setValueColumns(gridState.valueCols || []);
@@ -164,7 +164,6 @@ export default function TableWidget({ token }: { token: string }) {
   const handleFirstDataRendered = (event: FirstDataRenderedEvent) => {
     applySavedState(event.api);
   };
-
 
   if (loading) {
     return (
@@ -188,32 +187,10 @@ export default function TableWidget({ token }: { token: string }) {
 
   return (
     <div className="w-full h-full flex flex-col">
-      {/*
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
-        <h4 className="text-lg font-semibold truncate">
-          {title || "Table"}
-        </h4>
-        <div className="flex gap-2">
-          <button
-            onClick={exportCsv}
-            className="h-10 px-4 rounded-md border border-gray-300 bg-white text-sm hover:bg-gray-50"
-          >
-            Export CSV
-          </button>
-          <button
-            onClick={exportExcel}
-            className="h-10 px-4 rounded-md border border-gray-300 bg-white text-sm hover:bg-gray-50"
-          >
-            Export Excel
-          </button>
-        </div>
-      </div>
-      */}
-
       <div className="flex-none px-4 py-2">
         <h4 className="text-xl text-center font-bold">{title}</h4>
       </div>
-      <div className="ag-theme-alpine w-full flex-1 min-h-0">
+      <div className="ag-theme-alpine w-full flex-1 min-h-0" style={{minHeight: "70vh", height: "70vh"}}>
         <AgGridReact
           ref={gridRef}
           rowData={castedRows}
@@ -222,7 +199,8 @@ export default function TableWidget({ token }: { token: string }) {
           cellSelection={true}
           pagination={true}
           paginationPageSize={20}
-          domLayout="autoHeight"
+          domLayout="normal"
+          pivotMode={!!gridState?.pivotMode}
           sideBar={{
             defaultToolPanel: undefined,
             toolPanels: [
