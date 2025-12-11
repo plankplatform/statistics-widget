@@ -110,6 +110,11 @@ export default function TableWidget({ token }: { token: string }) {
     });
   }, [rows, columns]);
 
+  const normalizeCol = (text: string) => {
+    const cleaned = text.replace(/[_-]/g, " ");
+    return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+  };
+
   const columnDefs: ColDef[] = useMemo(() => {
     return columns.map((c) => {
       const sample = castedRows.find((r) => r[c] !== undefined)?.[c];
@@ -117,6 +122,7 @@ export default function TableWidget({ token }: { token: string }) {
 
       return {
         field: c,
+        headerName: normalizeCol(c),
         filter: isNumber ? "agNumberColumnFilter" : "agTextColumnFilter",
         type: isNumber ? "numericColumn" : undefined,
         chartDataType: isNumber ? "series" : "category",
@@ -159,13 +165,6 @@ export default function TableWidget({ token }: { token: string }) {
     applySavedState(event.api);
   };
 
-  const exportCsv = () => {
-    gridRef.current?.api?.exportDataAsCsv();
-  };
-
-  const exportExcel = () => {
-    gridRef.current?.api?.exportDataAsExcel();
-  };
 
   if (loading) {
     return (
@@ -189,6 +188,7 @@ export default function TableWidget({ token }: { token: string }) {
 
   return (
     <div className="w-full h-full flex flex-col">
+      {/*
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
         <h4 className="text-lg font-semibold truncate">
           {title || "Table"}
@@ -208,7 +208,11 @@ export default function TableWidget({ token }: { token: string }) {
           </button>
         </div>
       </div>
+      */}
 
+      <div className="flex-none px-4 py-2">
+        <h4 className="text-xl text-center font-bold">{title}</h4>
+      </div>
       <div className="ag-theme-alpine w-full flex-1 min-h-0">
         <AgGridReact
           ref={gridRef}
