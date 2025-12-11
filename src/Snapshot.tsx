@@ -23,6 +23,7 @@ type SnapshotPayload = {
   query_name?: string | null;
 };
 
+// Crea widget dinamico con scadenza fissata e dati provenienti da una tabella pubblica (analogo a widgetChart ma con diversa origine dei dati)
 export default function Snapshot({ token }: { token: string }) {
   const gridRef = useRef<AgGridReact>(null);
   const containerRef = useRef<HTMLDivElement>(null);

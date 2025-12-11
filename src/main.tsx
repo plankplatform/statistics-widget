@@ -49,7 +49,11 @@ async function setup() {
     return;
   }
 
-
+  /*
+  - Se nell'url vengono passati statId e graphId significa che la richiesta è per il widget statico -> l'unico che utilizza questa informazione nella generazione
+  - Se invece ho solo il token significa che la richiesta è per il widget dinamico -> non necessita di statId e graphId
+  - Se in aggiunta è indicata la view=table significa che la richiesta è per il widget dinamico + tabella
+  */
   if(statId && graphId){
     ReactDOM.createRoot(container).render(
       <WidgetChart statId={statId} graphId={graphId} />

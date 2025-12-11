@@ -51,6 +51,7 @@ function parseValue<T>(val: T | string | null | undefined): T | null {
   return val as T;
 }
 
+// Crea un widget tabella dinamico con scadenza fissata e dati provenienti da una tabella pubblica
 export default function TableWidget({ token }: { token: string }) {
   const gridRef = useRef<AgGridReact>(null);
   const [loading, setLoading] = useState(true);
