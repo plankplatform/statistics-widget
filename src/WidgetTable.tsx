@@ -70,7 +70,7 @@ export default function TableWidget({ token }: { token: string }) {
 
       try {
         const raw: SnapshotPayload = await apiFetchPublic(
-          `v1/newsletter/snapshots/${encodeURIComponent(token)}`
+          `v1/reporting/snapshots/${encodeURIComponent(token)}`
         );
 
         if (disposed) return;

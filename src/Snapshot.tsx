@@ -44,7 +44,7 @@ export default function Snapshot({ token }: { token: string }) {
       setLoading(true);
       setError(null);
       try {
-        const raw: SnapshotPayload = await apiFetchPublic(`v1/newsletter/snapshots/${encodeURIComponent(token)}`);
+        const raw: SnapshotPayload = await apiFetchPublic(`v1/reporting/snapshots/${encodeURIComponent(token)}`);
         if (disposed) return;
 
         const parseValue = <T,>(val: T | string | null | undefined) => {
@@ -65,7 +65,7 @@ export default function Snapshot({ token }: { token: string }) {
         const srt = parseValue(raw.sorting);
         const cfg = parseValue(raw.config);
         const query_name = parseValue(raw.query_name);
-        const grid_state = parseValue(raw.grid_state);
+        //const grid_state = parseValue(raw.grid_state);
 
         setColumns(cols);
         setRows(dataRows);
