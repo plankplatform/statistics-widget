@@ -24,12 +24,13 @@
     <div id="stats-widget"></div>
     <script>
       const urlParams = new URLSearchParams(window.location.search);
-      
+      const statId = urlParams.get('statId');
+      const graphId = urlParams.get('graphId');
       const token = urlParams.get('token');
-      if (token) {
+      if (token && statId && graphId) {
         sessionStorage.setItem('apitoken', token);
       }
     </script>
-    <script type="module" src="/plank/statistics-widget/dist/assets/main.js?v1.0.7"></script>
+    <script type="module" src="/plank/statistics-widget/dist/assets/main.js?v1.0.68"></script>
   </body>
 </html>
