@@ -5,7 +5,7 @@ Lingua:
 
 # Statistics Widget
 
-Applicazione React + TypeScript basata su Vite che espone un widget per visualizzare statistiche e grafici tramite AG Grid/AG Charts Enterprise. Il bundle puo essere incorporato in pagine esterne e si adatta a piu scenari di visualizzazione dati.
+Applicazione React + TypeScript basata su Vite che espone un widget per visualizzare statistiche e grafici tramite AG Grid/AG Charts Enterprise. Il bundle può essere incorporato in pagine esterne e si adatta a più scenari di visualizzazione dati.
 
 ## Varianti del widget
 - Widget statico: `statId` + `graphId` renderizzano il grafico salvato per una specifica statistica
@@ -38,14 +38,14 @@ npm install
 ```bash
 npm run dev
 ```
-Avvia il dev server Vite con hot reload. Il widget viene montato sull elemento `#stats-widget` leggendo i parametri dell URL (`statId`/`graphId` o `token` + opzionale `view=table`)
+Avvia il dev server Vite con hot reload. Il widget viene montato sull' elemento `#stats-widget` leggendo i parametri dell URL (`statId`/`graphId` o `token` + opzionale `view=table`)
 
 ## Build
 - `npm run build`: `tsc` + `vite build --mode development` per artefatti usati in test/stage (output in `dist/`)
 - `npm run release`: `tsc` + `vite build --mode production` per il bundle da mettere in produzione
 
 
-L' output finisce in `dist/` con file JS/CSS/HTML in `dist/assets/` (senza hash grazie alla configurazione Rollup).Public path configurato su `base: ./` per permettere hostaggio come asset statici. Se necessario aggiornare il numero della versione del main.js e main.css in widget.html quando si eseguono test locali.
+L' output finisce in `dist/` con file JS/CSS/HTML in `dist/assets/` (senza hash grazie alla configurazione Rollup). Public path configurato su `base: ./` per permettere hostaggio come asset statici. Se necessario aggiornare il numero della versione del main.js e main.css in widget.html quando si eseguono test locali.
 
 In particolare per il rilascio in **produzione** successivamente a `npm run release`eseguire:
 - git add .
@@ -75,4 +75,4 @@ Esempio di embedding che carica il widget statico:
 ```
 Parametri URL supportati:
 - `statId` + `graphId`: widget statico (usa token solo per sessionStorage se passato)
-- `token`: widget dinamico; aggiungi `view=table` per la tabella pivotabile
+- `token`: widget dinamico; aggiungere `view=table` per la tabella pivotabile
