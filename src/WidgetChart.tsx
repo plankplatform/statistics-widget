@@ -9,6 +9,7 @@ interface WidgetChartProps {
   graphId: string;
 }
 
+// Si tratta del widget statico -> versione più robusta di App -> non era in grado di renderizzare tutti i grafici
 export default function WidgetChart({ statId, graphId }: WidgetChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<AgGridReact>(null);
