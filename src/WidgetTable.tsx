@@ -14,6 +14,7 @@ import type {
 } from "ag-grid-community";
 import Loader from "./components/Loader";
 import { apiFetchPublic } from "./lib/api";
+import type { FilterModel } from "ag-grid-community";
 
 ModuleRegistry.registerModules([
   AllEnterpriseModule,
@@ -49,6 +50,18 @@ function parseValue<T>(val: T | string | null | undefined): T | null {
     }
   }
   return val as T;
+}
+
+function normalizeDateFilters( model: FilterModel | null | undefined): FilterModel | null {
+  if (!model) return null;
+  const copy: FilterModel = { ...model };
+  Object.values(copy).forEach((f: any) => {
+    if (f?.filterType === "date") {
+      if (typeof f.dateFrom === "string") f.dateFrom = f.dateFrom.split(" ")[0];
+      if (typeof f.dateTo === "string") f.dateTo = f.dateTo.split(" ")[0];
+    }
+  });
+  return copy;
 }
 
 // Crea un widget tabella dinamico con scadenza fissata e dati provenienti da una tabella pubblica
@@ -118,19 +131,57 @@ export default function TableWidget({ token }: { token: string }) {
 
   const columnDefs: ColDef[] = useMemo(() => {
     return columns.map((c) => {
-      const sample = castedRows.find((r) => r[c] !== undefined)?.[c];
-      const isNumber = typeof sample === "number";
+      const values = castedRows.map((r) => r[c]);
+
+      const isNumber = values.every((v) => typeof v === "number");
+      const isDate = values.every(
+        (v) => typeof v === "string" && !Number.isNaN(Date.parse(v))
+      );
+
+      let filter: any;
+      let type: any;
+      let filterParams: any;
+
+      if (isNumber) {
+        filter = "agNumberColumnFilter";
+        type = "numericColumn";
+      } else if (isDate) {
+        filter = "agDateColumnFilter";
+        type = "dateColumn";
+        filterParams = {
+          comparator: (filterDate: Date, cellValue: string) => {
+            const cellDate = new Date(cellValue);
+            const cellTime = new Date(
+              cellDate.getFullYear(),
+              cellDate.getMonth(),
+              cellDate.getDate()
+            ).getTime();
+            const filterTime = new Date(
+              filterDate.getFullYear(),
+              filterDate.getMonth(),
+              filterDate.getDate()
+            ).getTime();
+            if (cellTime < filterTime) return -1;
+            if (cellTime > filterTime) return 1;
+            return 0;
+          },
+        };
+      } else {
+        filter = "agTextColumnFilter";
+      }
 
       return {
+        colId: c,
         field: c,
         headerName: normalizeCol(c),
-        filter: isNumber ? "agNumberColumnFilter" : "agTextColumnFilter",
-        type: isNumber ? "numericColumn" : undefined,
+        filter,
+        sortable: true,
+        type,
+        filterParams,
         chartDataType: isNumber ? "series" : "category",
         enablePivot: true,
         enableRowGroup: true,
         enableValue: true,
-        sortable: true,
         resizable: true,
       };
     });
@@ -143,7 +194,8 @@ export default function TableWidget({ token }: { token: string }) {
     }
 
     api.setGridOption("pivotMode", !!gridState.pivotMode);
-    api.setFilterModel(gridState.filters || {});
+    api.setFilterModel(normalizeDateFilters(gridState.filters || null));
+
     api.setRowGroupColumns(gridState.rowGroupCols || []);
     api.setPivotColumns(gridState.pivotCols || []);
     api.setValueColumns(gridState.valueCols || []);
@@ -191,7 +243,10 @@ export default function TableWidget({ token }: { token: string }) {
       <div className="flex-none px-4 py-2">
         <h4 className="text-xl text-center font-bold">{title}</h4>
       </div>
-      <div className="ag-theme-alpine w-full flex-1 min-h-0" style={{minHeight: "70vh", height: "70vh"}}>
+      <div
+        className="ag-theme-alpine w-full flex-1 min-h-0"
+        style={{ minHeight: "70vh", height: "70vh" }}
+      >
         <AgGridReact
           ref={gridRef}
           rowData={castedRows}
